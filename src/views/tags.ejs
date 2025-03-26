@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tags</title>
+  <!-- Bootstrap 4.0.0 CDN -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+  <!-- Include Navbar -->
+  <%- include('_navbar') %>
+
+  <div class="container mt-5">
+    <h1 class="text-center">Tags</h1>
+    <p class="text-center">This is the Tags page where you can manage all tags.</p>
+
+    <!-- Add Tag Form -->
+    <div class="mt-4">
+      <h3>Add New Tag</h3>
+      <form action="/tags" method="POST">
+        <div class="form-group">
+          <label for="tagName">Tag Name</label>
+          <input type="text" class="form-control" id="tagName" name="tagName" placeholder="Enter tag name" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Tag</button>
+      </form>
+    </div>
+
+    <!-- List of Tags -->
+    <div class="mt-5">
+      <h3>Existing Tags</h3>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Tag Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% tags.forEach(tag => { %>
+          <tr>
+            <td><%= tag.tagName %></td>
+            <td>
+              <form action="/tags/delete/<%= tag._id %>" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and Dependencies -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9JoAPpSaXr69l+YtQpD0Knw1T9e5z5T5z5T5z5" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+
+</html>

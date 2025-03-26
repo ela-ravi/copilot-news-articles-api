@@ -1,0 +1,17 @@
+{"articleId": String,
+  "published": Date,
+  "author": {
+	"authorId": String,
+	"authorImage": Image(16:9),
+	"authorName": String
+	},
+  "category" : {
+	"categoryId": String,
+	"categoryName": String
+	},
+  "tags": String[],
+  "title": String,
+  "Subtitle": String,
+  "hero": String(url),
+  "description": String (HTML to be sanitized)
+}

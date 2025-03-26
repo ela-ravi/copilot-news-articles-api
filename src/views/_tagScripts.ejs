@@ -1,0 +1,79 @@
+<script>
+  // Initialize selectedTags from the hidden input field
+  let selectedTags = document.getElementById('tagsField').value ?
+    document.getElementById('tagsField').value.split(',') : [];
+
+  const existingTags = <%- JSON.stringify(tags || []) %>;
+
+  document.getElementById('tagInput').addEventListener('input', function(e) {
+    const input = e.target.value.toLowerCase();
+    const suggestions = existingTags.filter(tag =>
+      tag.toLowerCase().includes(input) && !selectedTags.includes(tag)
+    );
+
+    const suggestionDiv = document.getElementById('tagSuggestions');
+    suggestionDiv.innerHTML = '';
+
+    if (input && suggestions.length > 0) {
+      suggestions.forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-sm btn-outline-primary mr-1 mb-1';
+        btn.textContent = tag;
+        btn.onclick = () => {
+          e.preventDefault();
+          addTag(tag);
+        };
+        suggestionDiv.appendChild(btn);
+      });
+    }
+  });
+
+  document.getElementById('addTagBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('tagInput');
+    if (input.value.trim()) {
+      addTag(input.value.trim());
+    }
+  });
+
+  function addTag(tag) {
+    if (!selectedTags.includes(tag)) {
+      selectedTags.push(tag);
+      updateTagsDisplay();
+    }
+    document.getElementById('tagInput').value = '';
+    document.getElementById('tagSuggestions').innerHTML = '';
+  }
+
+  function removeTag(tag) {
+    selectedTags = selectedTags.filter(t => t !== tag);
+    updateTagsDisplay();
+  }
+
+  function updateTagsDisplay() {
+    const container = document.getElementById('selectedTags');
+    const tagsField = document.getElementById('tagsField');
+
+    container.innerHTML = selectedTags.map(tag => `
+      <span class="badge badge-primary mr-2 mb-2">
+        ${tag}
+        <button type="button" class="close ml-1" onclick="removeTag('${tag}')">&times;</button>
+      </span>
+    `).join('');
+
+    tagsField.value = selectedTags.join(',');
+  }
+
+  document.getElementById('tagInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const input = e.target;
+      if (input.value.trim()) {
+        addTag(input.value.trim());
+      }
+    }
+  });
+
+  // Initialize the display on page load
+  updateTagsDisplay();
+</script>

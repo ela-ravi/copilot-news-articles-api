@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Article</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <style>
+    .badge {
+      font-size: 14px;
+      padding: 8px;
+    }
+
+    .badge .close {
+      font-size: 18px;
+      padding: 0 4px;
+      margin-left: 6px;
+      opacity: 0.7;
+    }
+
+    .badge .close:hover {
+      opacity: 1;
+    }
+
+    #tagSuggestions {
+      max-height: 100px;
+      overflow-y: auto;
+    }
+
+    .btn-outline-primary {
+      margin: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Include Navbar -->
+  <%- include('_navbar') %>
+  <div class="container mt-5">
+    <h1 class="text-center">Edit Article</h1>
+
+    <!-- Success Message -->
+    <div id="success-message" class="alert alert-success d-none" role="alert"></div>
+
+    <form id="edit-article-form" action="/articles/edit/<%= article._id %>" method="POST">
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" name="title" value="<%= article.title %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="hero">Hero Image URL</label>
+        <input type="url" class="form-control" id="hero" name="hero" value="<%= article.hero %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="subtitle">Subtitle</label>
+        <input type="text" class="form-control" id="subtitle" name="subtitle" value="<%= article.subtitle %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="author">Author</label>
+        <select class="form-control" id="author" name="author" required>
+          <% authors.forEach(author => { %>
+          <option value="<%= author.authorId %>" <%= article.author.authorId === author.authorId ? 'selected' : '' %>>
+            <%= author.authorName %>
+          </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select class="form-control" id="category" name="category" required>
+          <% categories.forEach(category => { %>
+          <option value="<%= category.categoryId %>" <%= article.category.categoryId === category.categoryId ? 'selected' : '' %>>
+            <%= category.categoryName %>
+          </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <%- include('_tagManagement', { article: article, tags: tags }) %>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="description" name="description" required><%= article.description %></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="/" class="btn btn-secondary">Cancel</a>
+
+      <!-- Publish or Published Button -->
+      <% if (article.published) { %>
+      <button class="btn btn-secondary" disabled>Published</button>
+      <% } else { %>
+      <button type="button" class="btn btn-success" id="publish-button">Publish</button>
+      <% } %>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('edit-article-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const tagsField = document.getElementById('tagsField');
+      formData.set('tags', tagsField.value); // Ensure tags are included
+
+      try {
+        const response = await fetch(this.action, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams(formData)
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          const successMessage = document.getElementById('success-message');
+          successMessage.textContent = result.message;
+          successMessage.classList.remove('d-none');
+
+          // Scroll to success message
+          successMessage.scrollIntoView({
+            behavior: 'smooth'
+          });
+        } else {
+          alert(result.message || 'Error saving article');
+        }
+      } catch (err) {
+        console.error('Error saving article:', err);
+        alert('Error saving article');
+      }
+    });
+
+    // Handle Publish Button
+    document.getElementById("publish-button").addEventListener("click", async function() {
+      const form = document.getElementById("edit-article-form");
+      const formData = new URLSearchParams(new FormData(form));
+      formData.append("action", "publish");
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formData.toString()
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          const successMessage = document.getElementById("success-message");
+          successMessage.textContent = result.message;
+          successMessage.classList.remove("d-none");
+        } else {
+          alert(result.message || "Error publishing article");
+        }
+      } catch (err) {
+        console.error("Error publishing article:", err);
+        alert("Error publishing article");
+      }
+    });
+  </script>
+</body>
+
+</html>
